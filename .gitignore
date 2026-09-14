@@ -1,0 +1,8 @@
+/target
+**/test_snapshots
+.soroban
+.stellar
+.env
+
+# Internal partner-outreach playbook, kept local
+docs/validation-outreach.md
