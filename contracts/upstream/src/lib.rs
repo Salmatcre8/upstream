@@ -207,13 +207,25 @@ impl Upstream {
         let split_id: u64 = env.storage().instance().get(&DataKey::NextId).unwrap_or(0);
         validate_recipients(&env, split_id, split_id, &recipients);
 
-        let info = SplitInfo { owner: owner.clone(), locked, epoch: 0 };
+        let info = SplitInfo {
+            owner: owner.clone(),
+            locked,
+            epoch: 0,
+        };
         set_persistent(&env, &DataKey::Split(split_id), &info);
         set_persistent(&env, &DataKey::Recipients(split_id, 0), &recipients);
-        let next_id = split_id.checked_add(1).unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
+        let next_id = split_id
+            .checked_add(1)
+            .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
         env.storage().instance().set(&DataKey::NextId, &next_id);
 
-        SplitCreated { split_id, owner, locked, recipients: recipients.len() }.publish(&env);
+        SplitCreated {
+            split_id,
+            owner,
+            locked,
+            recipients: recipients.len(),
+        }
+        .publish(&env);
         split_id
     }
 
@@ -228,11 +240,23 @@ impl Upstream {
         }
         validate_recipients(&env, split_id, next_split_id(&env), &recipients);
 
-        info.epoch = info.epoch.checked_add(1).unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
-        set_persistent(&env, &DataKey::Recipients(split_id, info.epoch), &recipients);
+        info.epoch = info
+            .epoch
+            .checked_add(1)
+            .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
+        set_persistent(
+            &env,
+            &DataKey::Recipients(split_id, info.epoch),
+            &recipients,
+        );
         set_persistent(&env, &DataKey::Split(split_id), &info);
 
-        RecipientsUpdated { split_id, epoch: info.epoch, recipients: recipients.len() }.publish(&env);
+        RecipientsUpdated {
+            split_id,
+            epoch: info.epoch,
+            recipients: recipients.len(),
+        }
+        .publish(&env);
         info.epoch
     }
 
@@ -259,7 +283,12 @@ impl Upstream {
         let previous_owner = info.owner.clone();
         info.owner = new_owner.clone();
         set_persistent(&env, &DataKey::Split(split_id), &info);
-        OwnershipTransferred { split_id, previous_owner, new_owner }.publish(&env);
+        OwnershipTransferred {
+            split_id,
+            previous_owner,
+            new_owner,
+        }
+        .publish(&env);
     }
 
     /// Deposit up to `amount` of `token` from `from` into a split. Returns the
@@ -276,10 +305,12 @@ impl Upstream {
         let this = env.current_contract_address();
         let client = token::TokenClient::new(&env, &token);
         let before = client.balance(&this);
-        client.transfer(&from, &MuxedAddress::from(&this), &amount);
+        client.transfer(&from, MuxedAddress::from(&this), &amount);
         let after = client.balance(&this);
 
-        let delta = after.checked_sub(before).unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
+        let delta = after
+            .checked_sub(before)
+            .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
         // Never credit more than was requested, whatever the token reports.
         let received = if delta > amount { amount } else { delta };
         if received <= 0 {
@@ -287,20 +318,46 @@ impl Upstream {
         }
 
         credit(&env, split_id, info.epoch, &token, received);
-        Deposited { split_id, token, from, epoch: info.epoch, amount: received }.publish(&env);
+        Deposited {
+            split_id,
+            token,
+            from,
+            epoch: info.epoch,
+            amount: received,
+        }
+        .publish(&env);
         received
     }
 
     /// Move `child_id`'s share of `parent_id`'s `parent_epoch` into the child's
     /// current epoch. Anyone may call it. Returns the amount moved (0 if none).
-    pub fn pull(env: Env, parent_id: u64, parent_epoch: u32, child_id: u64, token: Address) -> i128 {
+    pub fn pull(
+        env: Env,
+        parent_id: u64,
+        parent_epoch: u32,
+        child_id: u64,
+        token: Address,
+    ) -> i128 {
         bump_instance(&env);
         let child = load_split(&env, child_id);
-        let amount = settle(&env, parent_id, parent_epoch, &Payee::Split(child_id), &token);
+        let amount = settle(
+            &env,
+            parent_id,
+            parent_epoch,
+            &Payee::Split(child_id),
+            &token,
+        );
         if amount > 0 {
             credit(&env, child_id, child.epoch, &token, amount);
-            Pulled { split_id: child_id, token, parent_id, parent_epoch, epoch: child.epoch, amount }
-                .publish(&env);
+            Pulled {
+                split_id: child_id,
+                token,
+                parent_id,
+                parent_epoch,
+                epoch: child.epoch,
+                amount,
+            }
+            .publish(&env);
         }
         amount
     }
@@ -339,7 +396,10 @@ impl Upstream {
     /// Total amount of `token` ever credited to `(split_id, epoch)`.
     pub fn get_received(env: Env, split_id: u64, epoch: u32, token: Address) -> i128 {
         load_split(&env, split_id);
-        env.storage().persistent().get(&DataKey::Acc(split_id, epoch, token)).unwrap_or(0)
+        env.storage()
+            .persistent()
+            .get(&DataKey::Acc(split_id, epoch, token))
+            .unwrap_or(0)
     }
 
     /// Amount `payee` could settle right now from `(split_id, epoch)`.
@@ -403,12 +463,36 @@ fn validate_recipients(env: &Env, self_id: u64, next_id: u64, recipients: &Vec<R
     }
 }
 
-fn payout(env: &Env, split_id: u64, epoch: u32, account: Address, token: Address, to: MuxedAddress) -> i128 {
-    let amount = settle(env, split_id, epoch, &Payee::Account(account.clone()), &token);
+fn payout(
+    env: &Env,
+    split_id: u64,
+    epoch: u32,
+    account: Address,
+    token: Address,
+    to: MuxedAddress,
+) -> i128 {
+    let amount = settle(
+        env,
+        split_id,
+        epoch,
+        &Payee::Account(account.clone()),
+        &token,
+    );
     if amount > 0 {
         // State is already settled above; the transfer is the last step.
-        token::TokenClient::new(env, &token).transfer(&env.current_contract_address(), &to, &amount);
-        Collected { split_id, token, account, epoch, amount }.publish(env);
+        token::TokenClient::new(env, &token).transfer(
+            &env.current_contract_address(),
+            &to,
+            &amount,
+        );
+        Collected {
+            split_id,
+            token,
+            account,
+            epoch,
+            amount,
+        }
+        .publish(env);
     }
     amount
 }
@@ -427,7 +511,12 @@ fn owed(env: &Env, split_id: u64, epoch: u32, payee: &Payee, token: &Address) ->
     let checkpoint: i128 = env
         .storage()
         .persistent()
-        .get(&DataKey::Checkpoint(split_id, epoch, payee.clone(), token.clone()))
+        .get(&DataKey::Checkpoint(
+            split_id,
+            epoch,
+            payee.clone(),
+            token.clone(),
+        ))
         .unwrap_or(0);
 
     let total = TOTAL_WEIGHT as i128;
@@ -441,7 +530,11 @@ fn owed(env: &Env, split_id: u64, epoch: u32, payee: &Payee, token: &Address) ->
 fn settle(env: &Env, split_id: u64, epoch: u32, payee: &Payee, token: &Address) -> i128 {
     let (amount, acc) = owed(env, split_id, epoch, payee, token);
     if amount > 0 {
-        set_persistent(env, &DataKey::Checkpoint(split_id, epoch, payee.clone(), token.clone()), &acc);
+        set_persistent(
+            env,
+            &DataKey::Checkpoint(split_id, epoch, payee.clone(), token.clone()),
+            &acc,
+        );
     }
     amount
 }
@@ -449,7 +542,9 @@ fn settle(env: &Env, split_id: u64, epoch: u32, payee: &Payee, token: &Address) 
 fn credit(env: &Env, split_id: u64, epoch: u32, token: &Address, amount: i128) {
     let key = DataKey::Acc(split_id, epoch, token.clone());
     let acc: i128 = env.storage().persistent().get(&key).unwrap_or(0);
-    let acc = acc.checked_add(amount).unwrap_or_else(|| panic_with_error!(env, Error::Overflow));
+    let acc = acc
+        .checked_add(amount)
+        .unwrap_or_else(|| panic_with_error!(env, Error::Overflow));
     // Keep `weight * acc` representable so settlement can never overflow.
     if acc.checked_mul(TOTAL_WEIGHT as i128).is_none() {
         panic_with_error!(env, Error::Overflow);
@@ -468,7 +563,9 @@ fn weight_of(env: &Env, recipients: &Vec<Recipient>, payee: &Payee) -> u32 {
 
 fn mul_div_floor(env: &Env, a: i128, b: i128, denominator: i128) -> i128 {
     // Both factors are non-negative, so truncating division is floor division.
-    a.checked_mul(b).unwrap_or_else(|| panic_with_error!(env, Error::Overflow)) / denominator
+    a.checked_mul(b)
+        .unwrap_or_else(|| panic_with_error!(env, Error::Overflow))
+        / denominator
 }
 
 fn load_split(env: &Env, split_id: u64) -> SplitInfo {
@@ -493,21 +590,30 @@ fn load_recipients(env: &Env, split_id: u64, epoch: u32) -> Vec<Recipient> {
     recipients
 }
 
-fn set_persistent<V: soroban_sdk::IntoVal<Env, soroban_sdk::Val>>(env: &Env, key: &DataKey, value: &V) {
+fn set_persistent<V: soroban_sdk::IntoVal<Env, soroban_sdk::Val>>(
+    env: &Env,
+    key: &DataKey,
+    value: &V,
+) {
     env.storage().persistent().set(key, value);
     bump_persistent(env, key);
 }
 
 fn bump_persistent(env: &Env, key: &DataKey) {
-    env.storage()
-        .persistent()
-        .extend_ttl_with_limits(key, TTL_EXTEND_TO, TTL_MIN_EXTENSION, TTL_MAX_EXTENSION);
+    env.storage().persistent().extend_ttl_with_limits(
+        key,
+        TTL_EXTEND_TO,
+        TTL_MIN_EXTENSION,
+        TTL_MAX_EXTENSION,
+    );
 }
 
 fn bump_instance(env: &Env) {
-    env.storage()
-        .instance()
-        .extend_ttl_with_limits(TTL_EXTEND_TO, TTL_MIN_EXTENSION, TTL_MAX_EXTENSION);
+    env.storage().instance().extend_ttl_with_limits(
+        TTL_EXTEND_TO,
+        TTL_MIN_EXTENSION,
+        TTL_MAX_EXTENSION,
+    );
 }
 
 #[cfg(test)]

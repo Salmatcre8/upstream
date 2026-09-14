@@ -1,0 +1,63 @@
+name: Bug report
+description: The contract, tests or docs don't behave as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        **Do not report security vulnerabilities here.** Anything that could lose, lock or redirect funds must go through [private vulnerability reporting](https://github.com/Salmatcre8/upstream/security/advisories/new). See [SECURITY.md](https://github.com/Salmatcre8/upstream/blob/main/SECURITY.md).
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the behaviour you saw.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How can we reproduce it?
+      description: A failing unit test is ideal. Otherwise list the exact contract calls, their arguments and the network.
+      placeholder: |
+        1. create_split with recipients ...
+        2. deposit 100 ...
+        3. collect ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Where did it happen?
+      options:
+        - Unit tests (cargo test)
+        - Stellar testnet
+        - Stellar mainnet
+        - Local network or other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Commit or version
+      placeholder: e.g. ec70870 or v0.1.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, errors or transaction hashes
+      render: shell

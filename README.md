@@ -1,6 +1,10 @@
 # Upstream
 
-Weighted, nestable, pull-based fund splits for Stellar.
+[![CI](https://github.com/Salmatcre8/upstream/actions/workflows/ci.yml/badge.svg)](https://github.com/Salmatcre8/upstream/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+![Status: testnet, unaudited](https://img.shields.io/badge/status-testnet%20%C2%B7%20unaudited-orange)
+
+**Fund your dependencies on-chain.** Weighted, nestable, pull-based fund splits for Stellar.
 
 A **split** routes everything it receives to a weighted list of recipients. A recipient is an
 account (`G...` or `C...`) or **another split**, so projects can build dependency trees: an app
@@ -112,7 +116,7 @@ are topics for indexing.
 
 ## Development
 
-Requires Rust with the `wasm32v1-none` target and `stellar-cli` 27+ (testnet runs Protocol 28).
+Requires [Rust](https://rustup.rs) (the toolchain pinned in `rust-toolchain.toml`, including the `wasm32v1-none` target, installs automatically) and [Stellar CLI](https://developers.stellar.org/docs/tools/cli/install-cli) 28.0.0 or newer. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
 ```sh
 cargo test                     # unit tests (mainnet resource limits enforced)
@@ -142,6 +146,14 @@ Mapped to SCF Build Award milestones.
 - [ ] Mainnet deployment, docs, monitoring
 - [ ] Streams on top of splits
 
+## Contributing
+
+Contributions are welcome: tests, the TypeScript SDK, and the roadmap features above. Read [CONTRIBUTING.md](CONTRIBUTING.md) to get set up, and look for issues labeled `good first issue`. Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security
+
+Upstream is unaudited. Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md), never in a public issue.
+
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE). Notable changes are recorded in [CHANGELOG.md](CHANGELOG.md).

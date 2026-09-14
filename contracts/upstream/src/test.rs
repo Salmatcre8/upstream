@@ -38,16 +38,27 @@ fn setup() -> Setup {
     let funder = Address::generate(&env);
     StellarAssetClient::new(&env, &sac.address()).mint(&funder, &1_000_000_000);
 
-    Setup { env, splits, token, funder }
+    Setup {
+        env,
+        splits,
+        token,
+        funder,
+    }
 }
 
 fn account(env: &Env, address: &Address, weight: u32) -> Recipient {
     let _ = env;
-    Recipient { payee: Payee::Account(address.clone()), weight }
+    Recipient {
+        payee: Payee::Account(address.clone()),
+        weight,
+    }
 }
 
 fn nested(split_id: u64, weight: u32) -> Recipient {
-    Recipient { payee: Payee::Split(split_id), weight }
+    Recipient {
+        payee: Payee::Split(split_id),
+        weight,
+    }
 }
 
 fn new_token(env: &Env, to: &Address, amount: i128) -> TokenClient<'static> {
@@ -59,7 +70,11 @@ fn new_token(env: &Env, to: &Address, amount: i128) -> TokenClient<'static> {
 #[test]
 fn deposit_and_collect_pays_each_recipient_its_weight() {
     let s = setup();
-    let (a, b, c) = (Address::generate(&s.env), Address::generate(&s.env), Address::generate(&s.env));
+    let (a, b, c) = (
+        Address::generate(&s.env),
+        Address::generate(&s.env),
+        Address::generate(&s.env),
+    );
     let recipients = vec![
         &s.env,
         account(&s.env, &a, 500_000),
@@ -69,9 +84,16 @@ fn deposit_and_collect_pays_each_recipient_its_weight() {
     let owner = Address::generate(&s.env);
     let id = s.splits.create_split(&owner, &recipients, &false);
 
-    assert_eq!(s.splits.deposit(&s.funder, &id, &s.token.address, &1_000), 1_000);
+    assert_eq!(
+        s.splits.deposit(&s.funder, &id, &s.token.address, &1_000),
+        1_000
+    );
     assert_eq!(s.token.balance(&s.splits.address), 1_000);
-    assert_eq!(s.splits.claimable(&id, &0, &Payee::Account(b.clone()), &s.token.address), 300);
+    assert_eq!(
+        s.splits
+            .claimable(&id, &0, &Payee::Account(b.clone()), &s.token.address),
+        300
+    );
 
     assert_eq!(s.splits.collect(&id, &0, &a, &s.token.address), 500);
     assert_eq!(s.splits.collect(&id, &0, &b, &s.token.address), 300);
@@ -93,14 +115,20 @@ fn deposit_and_collect_pays_each_recipient_its_weight() {
 #[test]
 fn rounding_never_overpays_and_never_compounds() {
     let s = setup();
-    let (a, b, c) = (Address::generate(&s.env), Address::generate(&s.env), Address::generate(&s.env));
+    let (a, b, c) = (
+        Address::generate(&s.env),
+        Address::generate(&s.env),
+        Address::generate(&s.env),
+    );
     let recipients = vec![
         &s.env,
         account(&s.env, &a, 333_333),
         account(&s.env, &b, 333_333),
         account(&s.env, &c, 333_334),
     ];
-    let id = s.splits.create_split(&Address::generate(&s.env), &recipients, &false);
+    let id = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &false);
 
     // Many tiny deposits, collecting after each one: per-deposit floors would
     // lose a unit every time, cumulative settlement must not.
@@ -125,7 +153,11 @@ fn rounding_never_overpays_and_never_compounds() {
 fn collect_needs_no_auth_but_only_pays_the_recipient() {
     let s = setup();
     let a = Address::generate(&s.env);
-    let id = s.splits.create_split(&Address::generate(&s.env), &vec![&s.env, account(&s.env, &a, 1_000_000)], &false);
+    let id = s.splits.create_split(
+        &Address::generate(&s.env),
+        &vec![&s.env, account(&s.env, &a, 1_000_000)],
+        &false,
+    );
     s.splits.deposit(&s.funder, &id, &s.token.address, &700);
 
     s.env.set_auths(&[]);
@@ -138,14 +170,25 @@ fn collect_to_requires_the_recipients_auth() {
     let s = setup();
     let a = Address::generate(&s.env);
     let elsewhere = MuxedAddress::from(&Address::generate(&s.env));
-    let id = s.splits.create_split(&Address::generate(&s.env), &vec![&s.env, account(&s.env, &a, 1_000_000)], &false);
+    let id = s.splits.create_split(
+        &Address::generate(&s.env),
+        &vec![&s.env, account(&s.env, &a, 1_000_000)],
+        &false,
+    );
     s.splits.deposit(&s.funder, &id, &s.token.address, &400);
 
     s.env.set_auths(&[]);
-    assert!(s.splits.try_collect_to(&id, &0, &a, &s.token.address, &elsewhere).is_err());
+    assert!(s
+        .splits
+        .try_collect_to(&id, &0, &a, &s.token.address, &elsewhere)
+        .is_err());
 
     s.env.mock_all_auths();
-    assert_eq!(s.splits.collect_to(&id, &0, &a, &s.token.address, &elsewhere), 400);
+    assert_eq!(
+        s.splits
+            .collect_to(&id, &0, &a, &s.token.address, &elsewhere),
+        400
+    );
     assert_eq!(s.token.balance(&elsewhere.address()), 400);
     assert_eq!(s.token.balance(&a), 0);
 }
@@ -158,14 +201,29 @@ fn a_recipient_without_a_trustline_only_blocks_itself() {
     let untrusted = MuxedAddress::generate(&s.env).address();
     let id = s.splits.create_split(
         &Address::generate(&s.env),
-        &vec![&s.env, account(&s.env, &healthy, 500_000), account(&s.env, &untrusted, 500_000)],
+        &vec![
+            &s.env,
+            account(&s.env, &healthy, 500_000),
+            account(&s.env, &untrusted, 500_000),
+        ],
         &false,
     );
     s.splits.deposit(&s.funder, &id, &s.token.address, &1_000);
 
     // The failed payout rolls back entirely: its share stays claimable.
-    assert!(s.splits.try_collect(&id, &0, &untrusted, &s.token.address).is_err());
-    assert_eq!(s.splits.claimable(&id, &0, &Payee::Account(untrusted.clone()), &s.token.address), 500);
+    assert!(s
+        .splits
+        .try_collect(&id, &0, &untrusted, &s.token.address)
+        .is_err());
+    assert_eq!(
+        s.splits.claimable(
+            &id,
+            &0,
+            &Payee::Account(untrusted.clone()),
+            &s.token.address
+        ),
+        500
+    );
 
     // Everyone else is unaffected.
     assert_eq!(s.splits.collect(&id, &0, &healthy, &s.token.address), 500);
@@ -177,10 +235,18 @@ fn updating_recipients_starts_a_new_epoch_and_keeps_old_funds_with_old_recipient
     let s = setup();
     let (a, b) = (Address::generate(&s.env), Address::generate(&s.env));
     let owner = Address::generate(&s.env);
-    let id = s.splits.create_split(&owner, &vec![&s.env, account(&s.env, &a, 1_000_000)], &false);
+    let id = s.splits.create_split(
+        &owner,
+        &vec![&s.env, account(&s.env, &a, 1_000_000)],
+        &false,
+    );
 
     s.splits.deposit(&s.funder, &id, &s.token.address, &100);
-    assert_eq!(s.splits.update_recipients(&id, &vec![&s.env, account(&s.env, &b, 1_000_000)]), 1);
+    assert_eq!(
+        s.splits
+            .update_recipients(&id, &vec![&s.env, account(&s.env, &b, 1_000_000)]),
+        1
+    );
     s.splits.deposit(&s.funder, &id, &s.token.address, &250);
 
     assert_eq!(s.splits.get_split(&id).epoch, 1);
@@ -202,13 +268,23 @@ fn locked_split_cannot_be_updated() {
     let a = Address::generate(&s.env);
     let recipients = vec![&s.env, account(&s.env, &a, 1_000_000)];
 
-    let id = s.splits.create_split(&Address::generate(&s.env), &recipients, &false);
+    let id = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &false);
     s.splits.lock(&id);
     assert!(s.splits.get_split(&id).locked);
-    assert_eq!(s.splits.try_update_recipients(&id, &recipients), Err(Ok(err(Error::Locked))));
+    assert_eq!(
+        s.splits.try_update_recipients(&id, &recipients),
+        Err(Ok(err(Error::Locked)))
+    );
 
-    let born_locked = s.splits.create_split(&Address::generate(&s.env), &recipients, &true);
-    assert_eq!(s.splits.try_update_recipients(&born_locked, &recipients), Err(Ok(err(Error::Locked))));
+    let born_locked = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &true);
+    assert_eq!(
+        s.splits.try_update_recipients(&born_locked, &recipients),
+        Err(Ok(err(Error::Locked)))
+    );
 }
 
 #[test]
@@ -216,14 +292,25 @@ fn owner_actions_require_owner_auth() {
     let s = setup();
     let a = Address::generate(&s.env);
     let recipients = vec![&s.env, account(&s.env, &a, 1_000_000)];
-    let id = s.splits.create_split(&Address::generate(&s.env), &recipients, &false);
+    let id = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &false);
 
     s.env.set_auths(&[]);
     assert!(s.splits.try_update_recipients(&id, &recipients).is_err());
     assert!(s.splits.try_lock(&id).is_err());
-    assert!(s.splits.try_transfer_ownership(&id, &Address::generate(&s.env)).is_err());
-    assert!(s.splits.try_create_split(&Address::generate(&s.env), &recipients, &false).is_err());
-    assert!(s.splits.try_deposit(&s.funder, &id, &s.token.address, &1).is_err());
+    assert!(s
+        .splits
+        .try_transfer_ownership(&id, &Address::generate(&s.env))
+        .is_err());
+    assert!(s
+        .splits
+        .try_create_split(&Address::generate(&s.env), &recipients, &false)
+        .is_err());
+    assert!(s
+        .splits
+        .try_deposit(&s.funder, &id, &s.token.address, &1)
+        .is_err());
 }
 
 #[test]
@@ -231,7 +318,9 @@ fn transfer_ownership_moves_control() {
     let s = setup();
     let a = Address::generate(&s.env);
     let recipients = vec![&s.env, account(&s.env, &a, 1_000_000)];
-    let id = s.splits.create_split(&Address::generate(&s.env), &recipients, &false);
+    let id = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &false);
 
     let new_owner = Address::generate(&s.env);
     s.splits.transfer_ownership(&id, &new_owner);
@@ -241,24 +330,39 @@ fn transfer_ownership_moves_control() {
 #[test]
 fn nested_splits_route_a_share_to_dependencies() {
     let s = setup();
-    let (maintainer, lib_one, lib_two) =
-        (Address::generate(&s.env), Address::generate(&s.env), Address::generate(&s.env));
+    let (maintainer, lib_one, lib_two) = (
+        Address::generate(&s.env),
+        Address::generate(&s.env),
+        Address::generate(&s.env),
+    );
 
     // A dependency list: two libraries, 60/40.
     let deps = s.splits.create_split(
         &Address::generate(&s.env),
-        &vec![&s.env, account(&s.env, &lib_one, 600_000), account(&s.env, &lib_two, 400_000)],
+        &vec![
+            &s.env,
+            account(&s.env, &lib_one, 600_000),
+            account(&s.env, &lib_two, 400_000),
+        ],
         &true,
     );
     // The app keeps 90% and routes 10% to its dependencies.
     let app = s.splits.create_split(
         &Address::generate(&s.env),
-        &vec![&s.env, account(&s.env, &maintainer, 900_000), nested(deps, 100_000)],
+        &vec![
+            &s.env,
+            account(&s.env, &maintainer, 900_000),
+            nested(deps, 100_000),
+        ],
         &false,
     );
 
     s.splits.deposit(&s.funder, &app, &s.token.address, &10_000);
-    assert_eq!(s.splits.claimable(&app, &0, &Payee::Split(deps), &s.token.address), 1_000);
+    assert_eq!(
+        s.splits
+            .claimable(&app, &0, &Payee::Split(deps), &s.token.address),
+        1_000
+    );
 
     // Anyone can push the share one hop down.
     s.env.set_auths(&[]);
@@ -266,7 +370,10 @@ fn nested_splits_route_a_share_to_dependencies() {
     assert_eq!(s.splits.pull(&app, &0, &deps, &s.token.address), 0);
     assert_eq!(s.splits.get_received(&deps, &0, &s.token.address), 1_000);
 
-    assert_eq!(s.splits.collect(&app, &0, &maintainer, &s.token.address), 9_000);
+    assert_eq!(
+        s.splits.collect(&app, &0, &maintainer, &s.token.address),
+        9_000
+    );
     assert_eq!(s.splits.collect(&deps, &0, &lib_one, &s.token.address), 600);
     assert_eq!(s.splits.collect(&deps, &0, &lib_two, &s.token.address), 400);
     assert_eq!(s.token.balance(&s.splits.address), 0);
@@ -277,8 +384,12 @@ fn pull_rejects_a_split_that_is_not_a_recipient() {
     let s = setup();
     let a = Address::generate(&s.env);
     let recipients = vec![&s.env, account(&s.env, &a, 1_000_000)];
-    let first = s.splits.create_split(&Address::generate(&s.env), &recipients, &false);
-    let second = s.splits.create_split(&Address::generate(&s.env), &recipients, &false);
+    let first = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &false);
+    let second = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &false);
 
     assert_eq!(
         s.splits.try_pull(&first, &0, &second, &s.token.address),
@@ -291,19 +402,32 @@ fn recipients_are_validated() {
     let s = setup();
     let owner = Address::generate(&s.env);
     let (a, b) = (Address::generate(&s.env), Address::generate(&s.env));
-    let create = |recipients: &Vec<Recipient>| s.splits.try_create_split(&owner, recipients, &false);
+    let create =
+        |recipients: &Vec<Recipient>| s.splits.try_create_split(&owner, recipients, &false);
 
     assert_eq!(create(&Vec::new(&s.env)), Err(Ok(err(Error::NoRecipients))));
     assert_eq!(
-        create(&vec![&s.env, account(&s.env, &a, 0), account(&s.env, &b, 1_000_000)]),
+        create(&vec![
+            &s.env,
+            account(&s.env, &a, 0),
+            account(&s.env, &b, 1_000_000)
+        ]),
         Err(Ok(err(Error::ZeroWeight)))
     );
     assert_eq!(
-        create(&vec![&s.env, account(&s.env, &a, 500_000), account(&s.env, &b, 400_000)]),
+        create(&vec![
+            &s.env,
+            account(&s.env, &a, 500_000),
+            account(&s.env, &b, 400_000)
+        ]),
         Err(Ok(err(Error::WeightsDoNotSumToTotal)))
     );
     assert_eq!(
-        create(&vec![&s.env, account(&s.env, &a, 500_000), account(&s.env, &a, 500_000)]),
+        create(&vec![
+            &s.env,
+            account(&s.env, &a, 500_000),
+            account(&s.env, &a, 500_000)
+        ]),
         Err(Ok(err(Error::DuplicatePayee)))
     );
     assert_eq!(
@@ -311,12 +435,23 @@ fn recipients_are_validated() {
         Err(Ok(err(Error::SelfReference)))
     );
     // The next id is this split's own id.
-    assert_eq!(create(&vec![&s.env, nested(0, 1_000_000)]), Err(Ok(err(Error::SelfReference))));
-
-    let first = s.splits.create_split(&owner, &vec![&s.env, account(&s.env, &a, 1_000_000)], &false);
-    assert_eq!(create(&vec![&s.env, nested(7, 1_000_000)]), Err(Ok(err(Error::SplitNotFound))));
     assert_eq!(
-        s.splits.try_update_recipients(&first, &vec![&s.env, nested(first, 1_000_000)]),
+        create(&vec![&s.env, nested(0, 1_000_000)]),
+        Err(Ok(err(Error::SelfReference)))
+    );
+
+    let first = s.splits.create_split(
+        &owner,
+        &vec![&s.env, account(&s.env, &a, 1_000_000)],
+        &false,
+    );
+    assert_eq!(
+        create(&vec![&s.env, nested(7, 1_000_000)]),
+        Err(Ok(err(Error::SplitNotFound)))
+    );
+    assert_eq!(
+        s.splits
+            .try_update_recipients(&first, &vec![&s.env, nested(first, 1_000_000)]),
         Err(Ok(err(Error::SelfReference)))
     );
 
@@ -331,11 +466,24 @@ fn recipients_are_validated() {
 fn deposits_are_validated() {
     let s = setup();
     let a = Address::generate(&s.env);
-    let id = s.splits.create_split(&Address::generate(&s.env), &vec![&s.env, account(&s.env, &a, 1_000_000)], &false);
+    let id = s.splits.create_split(
+        &Address::generate(&s.env),
+        &vec![&s.env, account(&s.env, &a, 1_000_000)],
+        &false,
+    );
 
-    assert_eq!(s.splits.try_deposit(&s.funder, &id, &s.token.address, &0), Err(Ok(err(Error::InvalidAmount))));
-    assert_eq!(s.splits.try_deposit(&s.funder, &id, &s.token.address, &-5), Err(Ok(err(Error::InvalidAmount))));
-    assert_eq!(s.splits.try_deposit(&s.funder, &99, &s.token.address, &5), Err(Ok(err(Error::SplitNotFound))));
+    assert_eq!(
+        s.splits.try_deposit(&s.funder, &id, &s.token.address, &0),
+        Err(Ok(err(Error::InvalidAmount)))
+    );
+    assert_eq!(
+        s.splits.try_deposit(&s.funder, &id, &s.token.address, &-5),
+        Err(Ok(err(Error::InvalidAmount)))
+    );
+    assert_eq!(
+        s.splits.try_deposit(&s.funder, &99, &s.token.address, &5),
+        Err(Ok(err(Error::SplitNotFound)))
+    );
 }
 
 #[test]
@@ -344,7 +492,11 @@ fn tokens_are_accounted_separately() {
     let (a, b) = (Address::generate(&s.env), Address::generate(&s.env));
     let id = s.splits.create_split(
         &Address::generate(&s.env),
-        &vec![&s.env, account(&s.env, &a, 250_000), account(&s.env, &b, 750_000)],
+        &vec![
+            &s.env,
+            account(&s.env, &a, 250_000),
+            account(&s.env, &b, 750_000),
+        ],
         &false,
     );
     let other = new_token(&s.env, &s.funder, 1_000_000);
@@ -355,7 +507,11 @@ fn tokens_are_accounted_separately() {
     assert_eq!(s.splits.collect(&id, &0, &a, &s.token.address), 100);
     assert_eq!(s.splits.collect(&id, &0, &a, &other.address), 2_000);
     assert_eq!(s.splits.collect(&id, &0, &b, &other.address), 6_000);
-    assert_eq!(s.splits.claimable(&id, &0, &Payee::Account(b.clone()), &s.token.address), 300);
+    assert_eq!(
+        s.splits
+            .claimable(&id, &0, &Payee::Account(b.clone()), &s.token.address),
+        300
+    );
     assert_eq!(other.balance(&s.splits.address), 0);
     assert_eq!(s.token.balance(&s.splits.address), 300);
 }
@@ -375,13 +531,20 @@ fn cost_report() {
         // live mainnet currently charges the 1,000 stroops/KB floor.
         let rent = fee.persistent_entry_rent + fee.temporary_entry_rent;
         let live = fee.total - rent + rent / 12;
-        std::println!("mainnet_estimate: {} stroops = {:.4} XLM", live, live as f64 / 1e7);
+        std::println!(
+            "mainnet_estimate: {} stroops = {:.4} XLM",
+            live,
+            live as f64 / 1e7
+        );
     };
 
     let per = TOTAL_WEIGHT / MAX_RECIPIENTS;
     let deps = s.splits.create_split(
         &Address::generate(&s.env),
-        &vec![&s.env, account(&s.env, &Address::generate(&s.env), 1_000_000)],
+        &vec![
+            &s.env,
+            account(&s.env, &Address::generate(&s.env), 1_000_000),
+        ],
         &false,
     );
     let mut recipients = Vec::new(&s.env);
@@ -392,13 +555,17 @@ fn cost_report() {
         recipients.push_back(account(&s.env, &last, per));
     }
 
-    let id = s.splits.create_split(&Address::generate(&s.env), &recipients, &false);
+    let id = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &false);
     report("create_split (50 recipients)");
 
-    s.splits.deposit(&s.funder, &id, &s.token.address, &1_000_000);
+    s.splits
+        .deposit(&s.funder, &id, &s.token.address, &1_000_000);
     report("deposit (first, creates acc entry)");
 
-    s.splits.deposit(&s.funder, &id, &s.token.address, &1_000_000);
+    s.splits
+        .deposit(&s.funder, &id, &s.token.address, &1_000_000);
     report("deposit (subsequent)");
 
     s.splits.collect(&id, &0, &last, &s.token.address);
@@ -435,8 +602,15 @@ fn a_full_split_stays_within_network_limits() {
         recipients.push_back(account(&s.env, &who, per));
         accounts.push(who);
     }
-    let id = s.splits.create_split(&Address::generate(&s.env), &recipients, &false);
-    s.splits.deposit(&s.funder, &id, &s.token.address, &(MAX_RECIPIENTS as i128 * 1_000));
+    let id = s
+        .splits
+        .create_split(&Address::generate(&s.env), &recipients, &false);
+    s.splits.deposit(
+        &s.funder,
+        &id,
+        &s.token.address,
+        &(MAX_RECIPIENTS as i128 * 1_000),
+    );
 
     // The last recipient is the most expensive lookup.
     let last = accounts.last().unwrap();
