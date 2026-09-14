@@ -4,7 +4,13 @@
 all-features = false
 
 [advisories]
-ignore = []
+ignore = [
+    # `paste` is unmaintained with no replacement available. It is a compile-time
+    # proc-macro pulled in transitively by soroban-sdk's host dependencies
+    # (ark-ff, wasmi_core) and ships no code in the contract. Revisit when
+    # soroban-sdk drops it.
+    { id = "RUSTSEC-2024-0436", reason = "unmaintained proc-macro via soroban-sdk; no runtime code, no upgrade available" },
+]
 
 [licenses]
 # Every dependency must be available under at least one of these licenses.
