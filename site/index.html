@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upstream · Fund your dependencies on-chain</title>
+<meta name="description" content="Upstream is a Soroban smart contract that routes a share of everything a project earns to the contributors and open-source libraries it is built on.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' fill='%23FDDA24' transform='rotate(45 16 16)'/%3E%3C/svg%3E">
+<script>try { if (localStorage.getItem("upstream-theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+  <div class="wrap header-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Upstream</span>
+    </a>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#problem">Problem</a>
+      <a href="#what">What it is</a>
+      <a href="#moves">Money</a>
+      <a href="#guarantees">Guarantees</a>
+      <a href="#accounting">Accounting</a>
+      <a href="#soroban">Soroban</a>
+      <a href="#interface">Interface</a>
+      <a href="#verification">Verification</a>
+      <a href="#landscape">Landscape</a>
+      <a href="#limitations">Limits</a>
+      <a href="#roadmap">Roadmap</a>
+    </nav>
+    <div class="header-actions">
+      <button id="theme-toggle" class="btn btn-chip theme-toggle" type="button" title="Toggle light and dark" aria-pressed="false">
+        <span class="theme-dot" aria-hidden="true"></span><span id="theme-label">Dark</span>
+      </button>
+      <a class="btn btn-accent btn-sm" href="https://lab.stellar.org/r/testnet/contract/CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG">Try it on testnet</a>
+    </div>
+  </div>
+</header>
+
+<main id="top" class="wrap">
+
+  <section class="hero">
+    <div class="split">
+      <div class="col-main">
+        <div class="hero-eyebrow">Project brief · Stellar · Soroban smart contract</div>
+        <h1>Fund your <span class="circled"><span>dependencies</span><img src="assets/brand/marks/mark-circle.png" alt=""></span> on-chain.</h1>
+        <p class="hero-lede">Upstream routes a share of everything a project earns to the contributors and open-source libraries it is built on, and lets those libraries do the same for theirs.</p>
+        <div class="cta-row">
+          <a class="btn btn-accent btn-lg btn-edged" href="https://lab.stellar.org/r/testnet/contract/CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG">Try it on testnet<code aria-hidden="true">→</code></a>
+          <a class="btn btn-outline btn-lg" href="https://github.com/Salmatcre8/upstream">github.com/Salmatcre8/upstream</a>
+          <span class="status-pill"><span aria-hidden="true"></span>Pre-audit · testnet only</span>
+        </div>
+        <div class="contract-line">
+          <span class="eyebrow">Contract</span>
+          <code class="contract-id">CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG</code>
+        </div>
+      </div>
+
+      <div class="deploy-card registered">
+        <div class="plate">
+          <div class="plate-head">
+            <span class="tag">Deployment</span>
+            <span class="meta">14 SEP 2026</span>
+          </div>
+          <dl class="spec-grid" style="margin:0">
+            <div class="spec"><dt class="spec-k">Network</dt><dd class="spec-v" style="margin:0">Stellar testnet<br><span class="mute">Protocol 28</span></dd></div>
+            <div class="spec"><dt class="spec-k">Toolchain</dt><dd class="spec-v" style="margin:0">soroban-sdk<br><span class="mute">27.0.6</span></dd></div>
+            <div class="spec"><dt class="spec-k">Weight scale</dt><dd class="spec-v" style="margin:0"><code>1,000,000</code> ppm</dd></div>
+            <div class="spec"><dt class="spec-k">Recipients</dt><dd class="spec-v" style="margin:0">up to 50 per split</dd></div>
+            <div class="spec"><dt class="spec-k">Wasm size</dt><dd class="spec-v" style="margin:0">13.7 KB <span class="mute">of 128 KiB</span></dd></div>
+            <div class="spec"><dt class="spec-k">Tests</dt><dd class="spec-v" style="margin:0">15 passing</dd></div>
+          </dl>
+          <div class="spec-foot">
+            <span class="spec-k" style="margin:0">License</span>
+            <code style="font-size:12.5px">Apache-2.0</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats registered">
+      <div class="stats-row">
+        <div class="stat"><span class="stat-n">1,000,000</span><div class="stat-k">ppm · weights sum exactly</div></div>
+        <div class="stat"><span class="stat-n">50</span><div class="stat-k">recipients per split</div></div>
+        <div class="stat"><span class="stat-n"><span class="circled"><span>0.0088</span><img src="assets/brand/marks/mark-circle-b.png" alt=""></span></span><div class="stat-k">XLM · a steady-state deposit</div></div>
+        <div class="stat"><span class="stat-n">&lt; 1%</span><div class="stat-k">of the per-tx CPU limit</div></div>
+        <div class="stat"><span class="stat-n">0</span><div class="stat-k">admin keys, fees, pause switches</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="problem" class="section">
+    <div class="section-head"><span class="section-num">01</span><h2>The problem</h2></div>
+    <div class="split">
+      <div class="col-main prose">
+        <p>Every app on Stellar runs on libraries someone else maintains: SDKs, wallet kits, oracles, indexers. The money the ecosystem earns rarely reaches those maintainers. Funding happens project by project, and the dependencies underneath stay invisible.</p>
+        <p>The SCF Public Goods Working Group wants to change that. Its plans include a Dependency-Matching Pool, retroactive public-goods funding, and a Dependency-Match Bonus that credits a project's top dependencies when it reaches mainnet. PG Atlas already maps the ecosystem's dependency graph and scores how critical each component is.</p>
+        <p>What's missing is the rail that moves the money. Stellar has no trustless, on-chain way to say "10% of everything this project receives goes to these dependencies, weighted like this," and have it happen without an administrator pressing a button. The one splitter SCF has funded is admin-triggered and has not been updated since October 2024. Drips, the best-known dependency-funding protocol, runs only on EVM chains; on Stellar it operates a bounty program, not its funding contracts.</p>
+      </div>
+      <div class="col-side registered">
+        <div class="exists">
+          <div class="eyebrow" style="font-size:9.5px;letter-spacing:.12em">What exists today</div>
+          <ul class="exists-list">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5c4.3 4.7 9.3 10.3 14.3 15.5M19.3 4.3C14.4 8.7 9.2 14 4.5 19.7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>An admin-triggered splitter, last updated October 2024</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5c4.3 4.7 9.3 10.3 14.3 15.5M19.3 4.3C14.4 8.7 9.2 14 4.5 19.7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>Drips, EVM-only; a bounty program on Stellar</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5c4.3 4.7 9.3 10.3 14.3 15.5M19.3 4.3C14.4 8.7 9.2 14 4.5 19.7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>Dependency graphs, but no rail to pay them</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="what" class="section">
+    <div class="section-head"><span class="section-num">02</span><h2>What Upstream is</h2></div>
+    <p class="lede">Upstream is a single Soroban contract that holds many splits. A split is a list of up to 50 weighted recipients, where weights are parts per million and must total exactly 1,000,000. A recipient is one of two things:</p>
+    <div class="grid-cards types">
+      <div class="registered"><div class="type-card">
+        <div class="tag">Recipient type 01</div>
+        <h3>An account.</h3>
+        <p>Any Stellar wallet (<code>G…</code>) or contract (<code>C…</code>), paid when it collects.</p>
+      </div></div>
+      <div class="registered"><div class="type-card type-card--split">
+        <div class="tag">Recipient type 02</div>
+        <h3>Another split.</h3>
+        <p>Its share flows into that split, which divides it again. This is how a project funds a dependency list, and how each dependency funds its own.</p>
+      </div></div>
+    </div>
+    <p class="lede">Anyone can deposit into a split: a grant tranche, app revenue, a bounty pool, an agent payment. Upstream accepts any Stellar asset contract or SEP-41 token, and keeps separate books for each.</p>
+
+    <figure class="fig">
+      <div class="registered">
+        <div class="plate">
+          <div class="plate-head">
+            <span class="tag">Fig. 01 · one Upstream contract holds every split's balance</span>
+            <div class="fig-controls">
+              <span id="flow-label" class="meta">idle</span>
+              <button id="flow-toggle" class="btn btn-chip" type="button">Pause</button>
+            </div>
+          </div>
+          <div class="flow-scroll">
+            <div id="flow" class="flow">
+              <svg id="flow-svg" viewBox="0 0 660 400" fill="none" role="img" aria-label="A funder deposits into an app split. The app split pays its maintainer 900,000 ppm through collect and moves 100,000 ppm into a dependency split through pull, which pays lib-one and lib-two through collect.">
+                <path id="up-e-dep" class="edge" d="M100 200 H166"></path>
+                <path id="up-e-main" class="edge" d="M312 182 H340 V100 H378"></path>
+                <path id="up-e-pull" class="edge" d="M312 218 H340 V298 H378"></path>
+                <path id="up-e-l1" class="edge" d="M502 284 H528 V256 H554"></path>
+                <path id="up-e-l2" class="edge" d="M502 312 H528 V342 H554"></path>
+                <rect class="pulse" x="-3.5" y="-3.5" width="7" height="7" opacity="0" fill="#FDDA24"><animate attributeName="opacity" dur="6s" begin="0s" repeatCount="indefinite" values="1;0" keyTimes="0;0.23" calcMode="discrete"/><animateMotion dur="6s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.22;1" calcMode="linear" path="M100 200 H166"/></rect>
+                <rect class="pulse" x="-3.5" y="-3.5" width="7" height="7" opacity="0" fill="#FDDA24"><animate attributeName="opacity" dur="6s" begin="1.7s" repeatCount="indefinite" values="1;0" keyTimes="0;0.27" calcMode="discrete"/><animateMotion dur="6s" begin="1.7s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.26;1" calcMode="linear" path="M312 182 H340 V100 H378"/></rect>
+                <rect class="pulse" x="-3.5" y="-3.5" width="7" height="7" opacity="0" fill="#B7ACE8"><animate attributeName="opacity" dur="6s" begin="1.7s" repeatCount="indefinite" values="1;0" keyTimes="0;0.27" calcMode="discrete"/><animateMotion dur="6s" begin="1.7s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.26;1" calcMode="linear" path="M312 218 H340 V298 H378"/></rect>
+                <rect class="pulse" x="-3.5" y="-3.5" width="7" height="7" opacity="0" fill="#FDDA24"><animate attributeName="opacity" dur="6s" begin="3.5s" repeatCount="indefinite" values="1;0" keyTimes="0;0.25" calcMode="discrete"/><animateMotion dur="6s" begin="3.5s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.24;1" calcMode="linear" path="M502 284 H528 V256 H554"/></rect>
+                <rect class="pulse" x="-3.5" y="-3.5" width="7" height="7" opacity="0" fill="#FDDA24"><animate attributeName="opacity" dur="6s" begin="3.5s" repeatCount="indefinite" values="1;0" keyTimes="0;0.25" calcMode="discrete"/><animateMotion dur="6s" begin="3.5s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.24;1" calcMode="linear" path="M502 312 H528 V342 H554"/></rect>
+                <text class="edge-label" x="133" y="191" text-anchor="middle">deposit</text>
+                <text class="edge-label" x="374" y="92" text-anchor="end">collect</text>
+                <text class="edge-label" x="374" y="290" text-anchor="end">pull</text>
+                <text class="edge-label" x="550" y="248" text-anchor="end">collect</text>
+                <text class="edge-label" x="550" y="334" text-anchor="end">collect</text>
+              </svg>
+              <div class="node" style="left:0;top:178px;width:100px">
+                <div class="node-k">any SAC token</div>
+                <div class="node-name" style="margin:0;font-size:13px">Funder</div>
+              </div>
+              <div class="node node--split" style="left:166px;top:154px;width:146px">
+                <div class="node-k">Split #1 · app</div>
+                <div style="font-size:12.5px;line-height:1.3;margin-bottom:4px">epoch 0</div>
+                <div class="node-v mute">acc <span id="flow-split1" style="color:var(--ink)">0</span></div>
+              </div>
+              <div class="node" style="left:378px;top:76px;width:124px">
+                <div class="node-name">Maintainer</div>
+                <div class="node-ppm">900,000 ppm</div>
+                <div id="flow-maint" class="node-v">claimable 0</div>
+              </div>
+              <div class="node node--deps" style="left:378px;top:272px;width:124px">
+                <div class="node-k">Split #0 · deps</div>
+                <div class="node-ppm">100,000 ppm</div>
+                <div class="node-v">acc <span id="flow-split0">0</span></div>
+              </div>
+              <div class="node node--lib" style="left:554px;top:240px;width:106px">
+                <div class="node-name">lib-one</div>
+                <div class="node-ppm">600,000 ppm</div>
+                <div id="flow-l1" class="node-v">claimable 0</div>
+              </div>
+              <div class="node node--lib" style="left:554px;top:326px;width:106px">
+                <div class="node-name">lib-two</div>
+                <div class="node-ppm">400,000 ppm</div>
+                <div id="flow-l2" class="node-v">claimable 0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="fig-caption">A two-level dependency tree. Money enters once with <code>deposit</code>; accounts leave with <code>collect</code>; nested splits receive their share with <code>pull</code>, one hop at a time.</figcaption>
+    </figure>
+  </section>
+
+  <section id="moves" class="section">
+    <div class="section-head"><span class="section-num">03</span><h2>How money moves</h2></div>
+    <p class="lede">Upstream never pays a whole recipient list in one transaction. Money moves in three independent calls, each small and bounded.</p>
+
+    <div class="grid-cards calls">
+      <div class="registered"><div class="call">
+        <div class="call-top">
+          <div><div class="tag">Call 01</div><h3>Deposit</h3></div>
+          <img src="assets/brand/icons/coin-swap.png" alt="">
+        </div>
+        <p>A funder sends tokens into a split. The contract measures how much it actually received and adds that to the split's running total for the current epoch. The cost is the same for a split with two recipients or fifty, which is what makes frequent small payments viable: a steady-state deposit on testnet costs 0.0088 XLM.</p>
+        <div class="call-foot">Signed by <b>from</b></div>
+      </div></div>
+      <div class="registered"><div class="call">
+        <div class="call-top">
+          <div><div class="tag">Call 02</div><h3>Collect</h3></div>
+          <img src="assets/brand/icons/wallet.png" alt="">
+        </div>
+        <p>Anyone can trigger an account recipient's payout, but the tokens only ever go to that recipient, so keepers, bots or friends can settle on someone's behalf without being able to redirect anything. A recipient that wants its funds elsewhere, such as an exchange deposit address with a memo ID, signs <code>collect_to</code> and picks the destination.</p>
+        <div class="call-foot">Signed by <b>anyone</b></div>
+      </div></div>
+      <div class="registered"><div class="call">
+        <div class="call-top">
+          <div><div class="tag">Call 03</div><h3>Pull</h3></div>
+          <img src="assets/brand/icons/package-tree.png" alt="">
+        </div>
+        <p>Anyone can move a nested split's share into that split's own current epoch. Deep dependency trees resolve one hop per call, so no transaction ever has to walk an unbounded graph.</p>
+        <div class="call-foot">Signed by <b>anyone</b></div>
+      </div></div>
+    </div>
+
+    <figure class="fig">
+      <div class="grid-cards demos">
+        <div class="registered"><div class="plate demo">
+          <div class="plate-head">
+            <span class="tag" style="letter-spacing:.12em">Push: one call pays everyone</span>
+            <span class="meta" style="font-size:9.5px">1 transaction</span>
+          </div>
+          <div class="demo-body">
+            <div class="demo-controls">
+              <span class="chip-node">Splitter</span>
+              <button id="push-run" class="btn btn-ink" type="button">distribute()</button>
+            </div>
+            <ul class="demo-list">
+              <li class="demo-row">alice<span class="demo-status" data-push="alice">pending</span></li>
+              <li class="demo-row">bob<span class="demo-status" data-push="bob">pending</span></li>
+              <li class="demo-row demo-row--solid"><span>carol <span class="aside-note">· no trustline</span></span><span class="demo-status" data-push="carol">pending</span></li>
+            </ul>
+          </div>
+          <div id="push-note" class="plate-foot" aria-live="polite">One transaction pays alice, bob and carol. Run it.</div>
+        </div></div>
+
+        <div class="registered"><div class="plate demo demo--upstream">
+          <div class="plate-head">
+            <span class="tag" style="letter-spacing:.12em">Upstream: each recipient settles alone</span>
+            <span id="pull-tx" class="meta" style="font-size:9.5px">0 of 3 transactions</span>
+          </div>
+          <div class="demo-body">
+            <div class="demo-controls">
+              <span class="chip-node chip-node--split">Split</span>
+              <button id="pull-reset" class="btn btn-chip" type="button" style="padding:8px 12px;font-size:10px">Reset</button>
+            </div>
+            <ul class="demo-list">
+              <li class="demo-row demo-row--settle">alice<button class="btn btn-collect" type="button" data-collect="alice">collect()</button></li>
+              <li class="demo-row demo-row--settle">bob<button class="btn btn-collect" type="button" data-collect="bob">collect()</button></li>
+              <li class="demo-row demo-row--settle"><span>carol <span class="aside-note">· no trustline</span></span><button class="btn btn-collect" type="button" data-collect="carol">collect()</button></li>
+            </ul>
+          </div>
+          <div id="pull-note" class="plate-foot" aria-live="polite">Three separate transactions. Settle each recipient yourself.</div>
+        </div></div>
+      </div>
+      <figcaption class="fig-caption"><strong>Fig. 02 · Why Upstream is pull-based.</strong> On Stellar, sending a token to an account without a trustline fails. A push payout lets one such recipient block everyone; Upstream isolates the failure to that recipient. This case is covered by a unit test.</figcaption>
+    </figure>
+  </section>
+
+  <section id="guarantees" class="section">
+    <div class="section-head"><span class="section-num">04</span><h2>Guarantees</h2></div>
+    <h3 class="subhead">Money already received cannot be redirected</h3>
+    <p class="lede">Changing a split's recipients starts a new epoch. Everything credited under the old recipient list stays with those recipients permanently; only deposits made after the change follow the new list. A split owner cannot quietly reroute funds that already arrived, and old epochs stay claimable forever.</p>
+
+    <figure class="fig" style="margin-top:clamp(28px,3.6vw,44px)">
+      <div class="registered">
+        <div class="plate">
+          <div class="plate-head">
+            <label class="tag" for="epoch-range" style="letter-spacing:.12em">Fig. 03 · scrub the ledger</label>
+            <span class="meta">step <span id="epoch-step">0 of 5</span></span>
+          </div>
+          <div class="epoch-body">
+            <input id="epoch-range" class="epoch-range" type="range" min="0" max="5" step="1" value="0">
+            <div class="epoch-ticks" aria-hidden="true">
+              <span>create</span><span>deposit 100</span><span>update</span><span>deposit 250</span><span>collect e0</span><span>collect e1</span>
+            </div>
+            <div id="epoch-event" class="epoch-event" aria-live="polite">create_split(owner, [alice 1,000,000], false) → id 1, epoch 0</div>
+            <div class="epoch-grid">
+              <div class="epoch-card">
+                <div class="epoch-card-head"><span class="tag">epoch 0</span><span id="e0-state" class="meta">current</span></div>
+                <div class="epoch-who">alice · <code>1,000,000 ppm</code></div>
+                <div class="kv">acc<span id="e0-acc">0</span></div>
+                <div class="kv">claimable<span id="e0-claim">0</span></div>
+                <div class="kv">paid out<span id="e0-paid">0</span></div>
+              </div>
+              <div class="epoch-card">
+                <div class="epoch-card-head"><span class="tag">epoch 1</span><span id="e1-state" class="meta">not created</span></div>
+                <div class="epoch-who">bob · <code>1,000,000 ppm</code></div>
+                <div class="kv">acc<span id="e1-acc">—</span></div>
+                <div class="kv">claimable<span id="e1-claim">—</span></div>
+                <div class="kv">paid out<span id="e1-paid">—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="fig-caption">Epochs make updates safe and cheap. The update writes one new recipient list; it never touches balances already credited to epoch 0.</figcaption>
+    </figure>
+
+    <h3 class="props-title">More properties</h3>
+    <div class="props">
+      <div class="prop"><b>Permanence on demand.</b><code>lock</code> freezes a split's recipients forever, or a split can be created locked.</div>
+      <div class="prop"><b>No trusted operator.</b>No admin key, no fees, no pause switch, no upgrade path. Only a split's owner controls that split, and handing it over needs both the current and the new owner to sign.</div>
+      <div class="prop"><b>Honest deposits.</b>Credits equal the contract's measured balance change, never more than the amount requested, so fee-on-transfer tokens are accounted correctly.</div>
+      <div class="prop"><b>Isolated tokens.</b>Balances are tracked per split, per epoch, per token. A broken or hostile token contract can only affect its own books.</div>
+    </div>
+  </section>
+
+  <section id="accounting" class="section">
+    <div class="section-head"><span class="section-num">05</span><h2>The accounting</h2></div>
+    <p class="lede">For every split, epoch and token, Upstream stores <code>acc</code>: the total amount ever credited. For every recipient that has settled, it stores a checkpoint of <code>acc</code> at that moment. A recipient with weight <code>w</code> is owed:</p>
+    <div class="registered formula-wrap">
+      <div class="plate formula">
+        <div>owed = ⌊ w × acc / 1,000,000 ⌋ − ⌊ w × checkpoint / 1,000,000 ⌋</div>
+        <div class="then">then&nbsp; checkpoint ← acc</div>
+      </div>
+    </div>
+    <p class="lede">Because entitlement is computed from the lifetime total rather than deposit by deposit, rounding never compounds. Each recipient loses at most one base unit per epoch, and that dust stays in the contract.</p>
+
+    <figure class="fig" style="margin-top:clamp(28px,3.6vw,44px)">
+      <div class="registered">
+        <div class="plate">
+          <div class="plate-head">
+            <span class="tag" style="letter-spacing:.12em">Fig. 04 · 30 deposits of 10 units, recipients collect after every deposit</span>
+            <div class="fig-controls">
+              <span class="meta">deposit <span id="round-label">0 / 30</span></span>
+              <button id="round-run" class="btn btn-run" type="button">Run 30 deposits</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data data--inset" style="font-size:13.5px">
+              <thead><tr>
+                <th scope="col">Recipient</th>
+                <th scope="col" class="num">Weight (ppm)</th>
+                <th scope="col" class="num">Per-deposit rounding</th>
+                <th scope="col" class="num col-up">Upstream</th>
+              </tr></thead>
+              <tbody>
+                <tr><td>alice</td><td class="num">333,333</td><td id="naive-a" class="num cell-mute">0</td><td id="up-a" class="num col-up">0</td></tr>
+                <tr><td>bob</td><td class="num">333,333</td><td id="naive-b" class="num cell-mute">0</td><td id="up-b" class="num col-up">0</td></tr>
+                <tr><td>carol</td><td class="num">333,334</td><td id="naive-c" class="num cell-mute">0</td><td id="up-c" class="num col-up">0</td></tr>
+                <tr><td class="strong">Lost to rounding <span class="mute" style="font-weight:400">of <span id="round-total">0</span></span></td><td></td><td id="naive-lost" class="num cell-mute">0</td><td id="up-lost" class="num col-up strong">0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <figcaption class="fig-caption">Arithmetic is checked everywhere, and a deposit is refused if it would push <code>weight × acc</code> past what an <code>i128</code> can hold, so settlement can never overflow.</figcaption>
+    </figure>
+
+    <figure class="fig fig--stack">
+      <div class="registered">
+        <div class="plate">
+          <div class="plate-head">
+            <span class="tag" style="letter-spacing:.12em">Fig. 05 · build a split</span>
+            <div class="fig-controls" style="gap:8px">
+              <button id="remove-recipient" class="btn btn-square" type="button" aria-label="Remove a recipient">−</button>
+              <span id="recipient-count" class="meta counter" aria-live="polite">3 recipients</span>
+              <button id="add-recipient" class="btn btn-square" type="button" aria-label="Add a recipient">+</button>
+            </div>
+          </div>
+          <div class="builder-body">
+            <div class="deposit-row">
+              <label class="eyebrow" for="deposit-xlm">deposit</label>
+              <input id="deposit-xlm" class="deposit-input" type="number" min="1" max="1000000000" step="1" value="1000">
+              <span class="meta" style="font-size:12px">XLM = <span id="deposit-stroops">10,000,000,000</span> stroops</span>
+            </div>
+            <div id="split-rows" class="split-rows"></div>
+            <div class="split-row split-total">
+              <div class="name">total</div>
+              <div id="dust" class="dust">dust retained: 0 stroops</div>
+              <div class="ppm">1,000,000</div>
+              <div id="paid-total" class="pay">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="fig-caption">Weights always resolve to exactly 1,000,000 ppm. Payouts are floored to the base unit, so whatever the weights, the contract keeps at most one stroop per recipient.</figcaption>
+    </figure>
+  </section>
+
+  <section id="soroban" class="section">
+    <div class="section-head"><span class="section-num">06</span><h2>Built for Soroban</h2></div>
+    <p class="lede">Each design choice answers a specific property of the Stellar network, verified against live mainnet settings.</p>
+    <div class="table-scroll">
+      <table class="data table-soroban">
+        <thead><tr>
+          <th scope="col" style="width:44%">Network property</th>
+          <th scope="col">How Upstream handles it</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Token transfers to an account without a trustline fail</td><td class="cell-soft">Per-recipient pull settlement; a failed <code>collect</code> rolls back and its share stays claimable</td></tr>
+          <tr><td>Per-transaction limits: 400M CPU instructions, 200 ledger writes</td><td class="cell-soft">Largest call uses about 1.98M instructions and 4 writes, under 1% of either limit</td></tr>
+          <tr><td>Storage expires: persistent entries start with 120 days (2,073,600 ledgers)</td><td class="cell-soft">Touched entries extend toward 120 days, only when at least a day is due, and by at most 30 days per call</td></tr>
+          <tr><td>Expired entries archive</td><td class="cell-soft">Uncollected balances are never lost; the next transaction that touches them restores them automatically</td></tr>
+          <tr><td>Storage rent: 1,000 stroops per KB on mainnet today</td><td class="cell-soft">About 0.17 XLM per KB per 120 days; a 50-recipient list is 6.4 KB</td></tr>
+          <tr><td>Muxed addresses cannot be stored as keys</td><td class="cell-soft">Recipients are stored as base addresses; <code>collect_to</code> accepts a muxed destination</td></tr>
+          <tr><td>RPC keeps events for about 7 days</td><td class="cell-soft">Every state change emits a typed event with split id and token as topics, ready for a long-lived indexer</td></tr>
+          <tr><td>Re-entrant calls are blocked by the host</td><td class="cell-soft">State is settled before every outgoing transfer regardless</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <svg viewBox="0 0 40 28" aria-hidden="true"><path d="M3 15.5c8.5-1.6 20.3-2.4 31.5-1.3M25.3 5.2c3.7 2.9 6.9 5.8 9.6 8.7-3.1 2.7-6.4 5.5-10 8.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><b>Found during development:</b> the SDK's local fee estimator prices storage rent at 12,000 stroops per KB, a deliberate overestimate. Live mainnet charges the 1,000 stroop floor, so local estimates overstate rent twelvefold.</div>
+    </div>
+  </section>
+
+  <section id="interface" class="section">
+    <div class="section-head"><span class="section-num">07</span><h2>Contract interface</h2></div>
+    <div class="table-scroll">
+      <table class="data table-interface">
+        <thead><tr>
+          <th scope="col" style="width:40%">Function</th>
+          <th scope="col" style="width:15%">Signed by</th>
+          <th scope="col">What it does</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><code>create_split(owner, recipients, locked)</code></td><td class="signer">owner</td><td class="cell-soft">Creates a split and returns its id</td></tr>
+          <tr><td><code>update_recipients(split_id, recipients)</code></td><td class="signer">owner</td><td class="cell-soft">Replaces recipients and starts a new epoch; fails if locked</td></tr>
+          <tr><td><code>lock(split_id)</code></td><td class="signer">owner</td><td class="cell-soft">Freezes recipients permanently</td></tr>
+          <tr><td><code>transfer_ownership(split_id, new_owner)</code></td><td class="signer">both owners</td><td class="cell-soft">Hands the split to a new owner</td></tr>
+          <tr><td><code>deposit(from, split_id, token, amount)</code></td><td class="signer">from</td><td class="cell-soft">Funds a split; returns the amount credited</td></tr>
+          <tr><td><code>pull(parent_id, parent_epoch, child_id, token)</code></td><td class="signer signer--any">anyone</td><td class="cell-soft">Moves a nested split's share into it</td></tr>
+          <tr><td><code>collect(split_id, epoch, account, token)</code></td><td class="signer signer--any">anyone</td><td class="cell-soft">Pays an account its share, to itself</td></tr>
+          <tr><td><code>collect_to(split_id, epoch, account, token, to)</code></td><td class="signer">account</td><td class="cell-soft">Pays the share to any address, including muxed</td></tr>
+          <tr><td><code>claimable(split_id, epoch, payee, token)</code></td><td class="signer signer--any">read only</td><td class="cell-soft">Amount a payee could settle now</td></tr>
+          <tr><td><code>get_split · get_recipients · get_received · next_split_id</code></td><td class="signer signer--any">read only</td><td class="cell-soft">Views</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="events">
+      <div class="eyebrow">Events</div>
+      <ul class="event-list">
+        <li><code>split_created</code></li>
+        <li><code>recipients_updated</code></li>
+        <li><code>split_locked</code></li>
+        <li><code>ownership_transferred</code></li>
+        <li><code>deposited</code></li>
+        <li><code>pulled</code></li>
+        <li><code>collected</code></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="verification" class="section">
+    <div class="section-head"><span class="section-num">08</span><h2>Verification</h2></div>
+    <div class="split">
+      <div class="col-half">
+        <h3 class="col-title">Unit tests</h3>
+        <p class="small-prose">Tests run against the Soroban host with mainnet resource limits and mainnet storage settings enforced.</p>
+        <ol class="tests">
+          <li><span>01</span>Each recipient is paid exactly its weight</li>
+          <li><span>02</span>Rounding never overpays and never compounds</li>
+          <li><span>03</span>Collect needs no signature but pays only the recipient</li>
+          <li><span>04</span>Collect-to requires the recipient's signature</li>
+          <li><span>05</span>A recipient without a trustline only blocks itself</li>
+          <li><span>06</span>Updates start an epoch and protect received funds</li>
+          <li><span>07</span>Locked splits cannot be updated</li>
+          <li><span>08</span>Owner actions require the owner's signature</li>
+          <li><span>09</span>Ownership transfer moves control</li>
+          <li><span>10</span>Nested splits route shares to dependencies</li>
+          <li><span>11</span>Pull rejects a split that is not a recipient</li>
+          <li><span>12</span>Recipient lists are validated</li>
+          <li><span>13</span>Deposits are validated</li>
+          <li><span>14</span>Tokens are accounted separately</li>
+          <li><span>15</span>A 50-recipient split stays within network limits</li>
+        </ol>
+      </div>
+
+      <div class="col-half">
+        <h3 class="col-title">Live on testnet</h3>
+        <p class="small-prose">The contract is deployed on Stellar testnet. A split paying alice 700,000 ppm and bob 300,000 ppm received deposits of 10 XLM and 1 XLM. Alice collected exactly 7 XLM and then 0.7 XLM; bob collected exactly 3 XLM. Every transfer and contract event appeared on-chain as expected.</p>
+        <div class="registered fee-plate">
+          <div class="plate">
+            <table class="data data--inset" style="font-size:13.5px">
+              <thead><tr><th scope="col">Call on testnet</th><th scope="col" class="num">Fee charged</th></tr></thead>
+              <tbody>
+                <tr><td>deposit, steady state</td><td class="num">0.0088 XLM</td></tr>
+                <tr><td>collect, steady state</td><td class="num">0.0242 XLM</td></tr>
+                <tr><td>First calls on a fresh deployment</td><td class="num">3.1–4.0 XLM</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="ink-2" style="font-size:14px;line-height:1.6;margin-top:20px">The first-call fees are almost entirely one-time storage rent: the first deposit paid 40.29M stroops of rent against 16.7K stroops of compute. Testnet's minimum storage lifetime is 7 days, so early calls topped the contract, its code and new entries up toward the 120-day target. Mainnet entries start at 120 days, so these become small daily extensions.</p>
+
+        <h3 class="costs-title">Estimated mainnet costs</h3>
+        <div class="table-scroll">
+          <table class="data table-costs">
+            <thead><tr>
+              <th scope="col">Call</th>
+              <th scope="col" class="num">CPU</th>
+              <th scope="col" class="num">Writes</th>
+              <th scope="col" class="num">Est. fee</th>
+            </tr></thead>
+            <tbody>
+              <tr><td><code>create_split</code>, 50 recipients</td><td class="num">1.96M</td><td class="num">4</td><td class="num">1.06 XLM</td></tr>
+              <tr><td><code>deposit</code>, first for a token</td><td class="num">0.38M</td><td class="num">4</td><td class="num">0.075 XLM</td></tr>
+              <tr><td><code>deposit</code>, subsequent</td><td class="num">0.41M</td><td class="num">4</td><td class="num">0.011 XLM</td></tr>
+              <tr><td><code>collect</code>, first time</td><td class="num">0.50M</td><td class="num">3</td><td class="num">0.078 XLM</td></tr>
+              <tr><td><code>pull</code></td><td class="num">0.31M</td><td class="num">2</td><td class="num">0.062 XLM</td></tr>
+              <tr><td><code>update_recipients</code>, 50 recipients</td><td class="num">1.98M</td><td class="num">3</td><td class="num">1.03 XLM</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Estimated with mainnet storage settings and the live rent rate. They exclude Wasm execution overhead, so treat them as lower bounds until confirmed on mainnet.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="landscape" class="section">
+    <div class="section-head"><span class="section-num">09</span><h2>Landscape</h2></div>
+    <p class="lede">Others have built payment splitting on Stellar. Upstream's focus is the guarantees dependency funding needs.</p>
+    <div class="table-scroll" style="margin-top:clamp(22px,3vw,32px)">
+      <table class="data table-landscape">
+        <thead><tr>
+          <th scope="col" style="width:17%"><span class="visually-hidden">Property</span></th>
+          <th scope="col" class="product col-up" style="width:22%">Upstream</th>
+          <th scope="col" class="product" style="width:20%">Tributary</th>
+          <th scope="col" class="product" style="width:20%">SoroSplits</th>
+          <th scope="col" class="product">Drips</th>
+        </tr></thead>
+        <tbody>
+          <tr><th scope="row" class="row-key">Status</th><td class="col-up">Testnet, unaudited</td><td class="cell-soft">Testnet, unaudited, active</td><td class="cell-soft">SCF #19 and #23 ($153.7K); last update Oct 2024</td><td class="cell-soft">Production on EVM chains; on Stellar, bounty program only</td></tr>
+          <tr><th scope="row" class="row-key">Payouts</th><td class="col-up">Per-recipient pull, anyone triggers</td><td class="cell-soft">Push <code>pay()</code>, or deposit then <code>distribute()</code></td><td class="cell-soft">Admin triggers, recipients withdraw</td><td class="cell-soft">Pull-based</td></tr>
+          <tr><th scope="row" class="row-key">Changing recipients after funds arrive</th><td class="col-up">New epoch; received funds protected</td><td class="cell-soft">Controller updates; no epochs documented</td><td class="cell-soft">Editable until locked</td><td class="cell-soft">Owner updates</td></tr>
+          <tr><th scope="row" class="row-key">Nested splits</th><td class="col-up">Yes, one hop per <code>pull</code></td><td class="cell-soft">Yes</td><td class="cell-soft">Manual</td><td class="cell-soft">Yes, Drip Lists</td></tr>
+          <tr><th scope="row" class="row-key">Rounding</th><td class="col-up">At most 1 unit per recipient per epoch</td><td class="cell-soft">Dust to the last recipient each payout</td><td class="cell-soft">Basis points</td><td class="cell-soft">Dust stays with the splitter</td></tr>
+          <tr><th scope="row" class="row-key">SDK and dashboard</th><td class="col-up cell-mute">Not yet</td><td class="cell-soft">Yes</td><td class="cell-soft">Yes</td><td class="cell-soft">Yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Tributary and Drips details come from their public documentation as of September 2026.</p>
+  </section>
+
+  <section id="limitations" class="section">
+    <div class="section-head"><span class="section-num">10</span><h2>Limitations</h2></div>
+    <ol class="limits">
+      <li><span>01</span><div><b>Not audited and not on mainnet.</b> Do not use it with real funds yet.</div></li>
+      <li><span>02</span><div>No TypeScript SDK or dashboard yet.</div></li>
+      <li><span>03</span><div>No payments to GitHub repositories before their maintainers claim them.</div></li>
+      <li><span>04</span><div>No per-split deposit address, so plain payments such as x402 cannot route into a split directly.</div></li>
+      <li><span>05</span><div>One contract custodies every split's funds.</div></li>
+      <li><span>06</span><div>Split loops (A pays B, B pays A) are allowed. Funds cannot be lost, but they can circulate.</div></li>
+      <li><span>07</span><div>If a token over-reports a transfer, any excess beyond the requested amount stays in the contract.</div></li>
+      <li><span>08</span><div>Anyone can trigger a payout to a recipient, even one that would rather wait.</div></li>
+    </ol>
+  </section>
+
+  <section id="roadmap" class="section">
+    <div class="section-head"><span class="section-num">11</span><h2>Roadmap</h2></div>
+    <p class="lede">Mapped to the three Stellar Community Fund build milestones.</p>
+    <div class="grid-cards tranches">
+      <div class="registered"><div class="tranche tranche--now">
+        <div class="tranche-head"><span class="tag">Tranche 1</span><span class="meta">in hand</span></div>
+        <h3>MVP</h3>
+        <ul class="checklist">
+          <li class="done">Core contract: create, update with epochs, lock, ownership, deposit, pull, collect</li>
+          <li class="done">15 unit tests under mainnet limits, plus a cost report</li>
+          <li class="done">Testnet deployment with end-to-end verification</li>
+          <li>TypeScript bindings and SDK</li>
+          <li>Property and fuzz tests for accounting invariants</li>
+        </ul>
+      </div></div>
+      <div class="registered"><div class="tranche">
+        <div class="tranche-head"><span class="tag">Tranche 2</span></div>
+        <h3>Testnet</h3>
+        <ul class="checklist">
+          <li>Repository payees: fund a GitHub repo before its maintainer claims it, with a refund deadline and a swappable attestation verifier</li>
+          <li>Import dependency weights from PG Atlas</li>
+          <li>Per-split deposit addresses, so x402 and plain payments route into a split</li>
+          <li>Indexer and dashboard for splits, flows and claimable balances</li>
+        </ul>
+      </div></div>
+      <div class="registered"><div class="tranche">
+        <div class="tranche-head"><span class="tag">Tranche 3</span></div>
+        <h3>Mainnet</h3>
+        <ul class="checklist">
+          <li>Security audit through the Soroban Audit Bank</li>
+          <li>Mainnet deployment, documentation and monitoring</li>
+          <li>Payment streams built on top of splits</li>
+        </ul>
+      </div></div>
+    </div>
+  </section>
+
+  <section id="open-source" class="section section--last">
+    <div class="section-head"><span class="section-num">12</span><h2>Open source</h2></div>
+    <div class="split">
+      <div class="col-main prose" style="flex-basis:420px">
+        <p>Upstream is written from scratch and released under the Apache-2.0 license. The code, tests and documentation live at <a href="https://github.com/Salmatcre8/upstream">github.com/Salmatcre8/upstream</a>.</p>
+        <p style="font-size:17px">Contributions are welcome, from new tests and SDK work to the repository-payee and PG Atlas features on the roadmap. The repository's contribution guide explains how to set up the toolchain and run the tests, and its security policy explains how to report vulnerabilities privately.</p>
+      </div>
+      <div class="col-side registered" style="min-width:250px">
+        <div class="plate os-card">
+          <img src="assets/brand/icons/handshake.png" alt="">
+          <div class="os-title">Good first issues are labelled.</div>
+          <div class="os-text">Tests, the TypeScript SDK, and the roadmap features above.</div>
+          <a class="link-arrow" href="https://github.com/Salmatcre8/upstream/issues">Open the repository <code aria-hidden="true">→</code></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <img class="halo" src="assets/brand/marks/halo-dots.png" alt="">
+  <div class="wrap footer-inner">
+    <h2>Try a split on testnet.</h2>
+    <p>Deposit a test asset, watch the events, collect from an account that has no trustline and see only that recipient fail.</p>
+    <div class="footer-cta">
+      <a class="btn btn-yellow" href="https://lab.stellar.org/r/testnet/contract/CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG">Open in Stellar Lab<code aria-hidden="true">→</code></a>
+      <a class="btn btn-light" href="https://github.com/Salmatcre8/upstream">Read the contract</a>
+    </div>
+    <div class="footer-meta">
+      <div>
+        <div class="footer-k">Contract · Stellar testnet</div>
+        <code class="footer-id">CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG</code>
+        <div class="footer-fine">Upstream · project brief · figures as of 14 September 2026 · Apache-2.0</div>
+      </div>
+      <div class="built-on">
+        <span class="footer-k">Built on</span>
+        <img src="assets/brand/logos/stellar-logo-light.png" alt="Stellar">
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
