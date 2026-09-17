@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-17
+
+First public pre-release. The contract is unaudited and deployed on Stellar testnet only.
+
 ### Added
 
 - Splits contract: `create_split`, `update_recipients` with epochs, `lock`, `transfer_ownership`,
@@ -22,5 +26,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   templates, code owners.
 - CI for formatting, clippy, tests, Wasm build with size check, and a cargo-deny dependency audit;
   Dependabot for Cargo and GitHub Actions.
+- Static landing page in `site/`, with web-sized icons and logo.
 
-[Unreleased]: https://github.com/Salmatcre8/upstream/commits/main
+### Security
+
+- The dependency audit ignores RUSTSEC-2024-0436 (`paste` is unmaintained). It is a compile-time
+  dependency of `soroban-sdk` with no upgrade available and ships no code in the contract.
+
+[Unreleased]: https://github.com/Salmatcre8/upstream/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Salmatcre8/upstream/releases/tag/v0.1.0
