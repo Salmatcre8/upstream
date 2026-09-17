@@ -16,7 +16,11 @@ from a dependency graph (e.g. [PG Atlas](https://scf-public-goods-maintenance.gi
 and any income stream (grant tranches, bounty pools, revenue, x402 payments) can be routed through
 a split.
 
-> Status: pre-audit MVP on `soroban-sdk` 27. Not deployed to mainnet. Do not use with real funds.
+> Status: pre-audit MVP on `soroban-sdk` 27, deployed on Stellar testnet as
+> [`CCNQHI3P…5POG`](https://lab.stellar.org/r/testnet/contract/CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG).
+> Not deployed to mainnet. Do not use with real funds.
+>
+> The project landing page lives in [`site/`](site): static HTML, CSS and JavaScript with no build step.
 
 ## Why another splitter?
 
