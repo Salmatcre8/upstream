@@ -122,6 +122,10 @@ are topics for indexing.
 
 Requires [Rust](https://rustup.rs) (the toolchain pinned in `rust-toolchain.toml`, including the `wasm32v1-none` target, installs automatically) and [Stellar CLI](https://developers.stellar.org/docs/tools/cli/install-cli) 28.0.0 or newer. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
+To call the deployed contract yourself, follow the
+[testnet walkthrough](docs/testnet-walkthrough.md): every command, transaction hash and fee from the
+live run, including why the first calls cost 4 XLM and the ones after cost 0.0088.
+
 ```sh
 cargo test                     # unit tests (mainnet resource limits enforced)
 stellar contract build         # builds target/wasm32v1-none/release/upstream.wasm

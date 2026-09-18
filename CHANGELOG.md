@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `docs/testnet-walkthrough.md`: the commands, transaction hashes and fees from the live testnet
+  run, with a breakdown of why the first calls cost storage rent.
+
 ## [0.1.0] - 2026-09-17
 
 First public pre-release. The contract is unaudited and deployed on Stellar testnet only.
