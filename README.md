@@ -21,6 +21,9 @@ a split.
 > Not deployed to mainnet. Do not use with real funds.
 >
 > The project landing page lives in [`site/`](site): static HTML, CSS and JavaScript with no build step.
+>
+> The TypeScript client lives in [`sdk/`](sdk): generated bindings plus helpers for
+> building weights that add up and amounts that do not lose precision.
 
 ## Why another splitter?
 
@@ -129,6 +132,9 @@ live run, including why the first calls cost tens of XLM in storage rent while t
 ```sh
 cargo test                     # unit tests (mainnet resource limits enforced)
 stellar contract build         # builds target/wasm32v1-none/release/upstream.wasm
+
+cd sdk && npm install && npm test   # the TypeScript client
+npm run example:read                # reads the live testnet split
 ```
 
 ## Roadmap
@@ -139,7 +145,7 @@ Mapped to SCF Build Award milestones.
 - [x] Core splits contract: create, update (epochs), lock, ownership, deposit, pull, collect
 - [x] Unit tests incl. rounding, auth, nesting, token isolation, max-size split under network limits
 - [x] Testnet deployment and end-to-end verification
-- [ ] TypeScript bindings/SDK
+- [x] TypeScript bindings/SDK ([`sdk/`](sdk))
 - [ ] Fuzz / property tests for accounting invariants
 
 **Testnet**

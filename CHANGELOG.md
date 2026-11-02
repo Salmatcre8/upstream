@@ -17,6 +17,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `sdk/`: a TypeScript client. Generated bindings for every entrypoint, plus the helpers
+  that keep callers out of trouble: `recipientsFromShares` turns shares in any units into
+  ppm weights that add up to exactly 1,000,000 (largest remainder, computed in `BigInt`),
+  `assertValidRecipients` applies the contract's own rules client-side, and
+  `parseAmount`/`formatAmount` convert decimal text to base units without floating point.
+  20 unit tests, a runnable example that reads the live testnet split, and a CI job that
+  fails if the vendored bindings drift from the contract's interface.
+
 - `docs/testnet-walkthrough.md`: the commands, transaction hashes and fees from the live testnet
   run, with a breakdown of why the first calls cost storage rent.
 - Fee comparison between the September and October testnet runs, showing rent rising about tenfold

@@ -71,3 +71,31 @@ jobs:
           size="$(stat -c%s target/wasm32v1-none/release/upstream.wasm)"
           echo "upstream.wasm: ${size} bytes (limit ${WASM_SIZE_LIMIT})"
           test "$size" -le "$WASM_SIZE_LIMIT"
+
+      # Run here rather than in the sdk job, which has neither the Rust
+      # toolchain nor the Stellar CLI this needs.
+      - name: Check the TypeScript bindings match the contract
+        run: node sdk/scripts/check-bindings.mjs
+
+  sdk:
+    name: TypeScript SDK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: sdk/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck and test
+        run: npm test
