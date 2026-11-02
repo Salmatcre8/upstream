@@ -16,8 +16,8 @@ from a dependency graph (e.g. [PG Atlas](https://scf-public-goods-maintenance.gi
 and any income stream (grant tranches, bounty pools, revenue, x402 payments) can be routed through
 a split.
 
-> Status: pre-audit MVP on `soroban-sdk` 27, deployed on Stellar testnet as
-> [`CCNQHI3P…5POG`](https://lab.stellar.org/r/testnet/contract/CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG).
+> Status: pre-audit MVP on `soroban-sdk` 28, deployed on Stellar testnet as
+> [`CAZLMMGS…RGBS`](https://lab.stellar.org/r/testnet/contract/CAZLMMGSAHCLH66EHM6ROL3PA2Y5Z2OQKJHN7GMZEBGDGVRYYCGHRGBS).
 > Not deployed to mainnet. Do not use with real funds.
 >
 > The project landing page lives in [`site/`](site): static HTML, CSS and JavaScript with no build step.
@@ -80,18 +80,18 @@ them as lower-bound estimates until confirmed by testnet simulation.
 All calls use well under 1% of the 400M instruction and 200 write-entry per-transaction limits.
 Rent dominates: a split's recipient list costs about 0.17 XLM per KB per 120 days.
 
-### Testnet verification (2026-09-14)
+### Testnet verification (2026-10-23)
 
 Deployed on testnet (Protocol 28, `stellar-cli` 28.0.0) as
-[`CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG`](https://lab.stellar.org/r/testnet/contract/CCNQHI3PBXFDMGOM32WAY5UB6WLPU2X4RLK6XF7FRRFAZ3GCHRVY5POG)
-(optimized Wasm: 13,709 bytes). A 70/30 split received 10 XLM and 1 XLM deposits; both recipients
+[`CAZLMMGSAHCLH66EHM6ROL3PA2Y5Z2OQKJHN7GMZEBGDGVRYYCGHRGBS`](https://lab.stellar.org/r/testnet/contract/CAZLMMGSAHCLH66EHM6ROL3PA2Y5Z2OQKJHN7GMZEBGDGVRYYCGHRGBS)
+(optimized Wasm: 14,256 bytes). A 70/30 split received 10 XLM and 1 XLM deposits; both recipients
 collected exactly 7 + 0.7 XLM and 3 XLM.
 
 | Call | Fee charged |
 |---|---:|
-| `deposit` (steady state) | 0.0088 XLM |
-| `collect` (steady state) | 0.0242 XLM |
-| First calls on a fresh deployment (`create_split`, first `deposit`, first `collect`s) | 3.1-4.0 XLM each |
+| `deposit` (steady state) | 0.0662 XLM |
+| `collect` (steady state) | 0.2136 XLM |
+| First calls on a fresh deployment (`create_split`, first `deposit`, first `collect`s) | 32-42 XLM each |
 
 The first-call fees are almost entirely storage rent (e.g. the first deposit: 40.29M stroops
 refundable rent vs 16.7K stroops CPU/IO). Testnet's minimum persistent TTL is 7 days, so early calls
@@ -124,7 +124,7 @@ Requires [Rust](https://rustup.rs) (the toolchain pinned in `rust-toolchain.toml
 
 To call the deployed contract yourself, follow the
 [testnet walkthrough](docs/testnet-walkthrough.md): every command, transaction hash and fee from the
-live run, including why the first calls cost 4 XLM and the ones after cost 0.0088.
+live run, including why the first calls cost tens of XLM in storage rent while the ones after cost a fraction of one.
 
 ```sh
 cargo test                     # unit tests (mainnet resource limits enforced)

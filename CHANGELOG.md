@@ -19,6 +19,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `docs/testnet-walkthrough.md`: the commands, transaction hashes and fees from the live testnet
   run, with a breakdown of why the first calls cost storage rent.
+- Fee comparison between the September and October testnet runs, showing rent rising about tenfold
+  while compute got cheaper, and what that means for budgeting a Soroban contract.
+
+### Changed
+
+- Redeployed to Stellar testnet under Protocol 28, built with `soroban-sdk` 28:
+  [`CAZLMMGSAHCLH66EHM6ROL3PA2Y5Z2OQKJHN7GMZEBGDGVRYYCGHRGBS`](https://lab.stellar.org/r/testnet/contract/CAZLMMGSAHCLH66EHM6ROL3PA2Y5Z2OQKJHN7GMZEBGDGVRYYCGHRGBS).
+  The end-to-end flow was re-verified: a 70/30 split paid exactly 7 and 3 XLM from a 10 XLM deposit,
+  a second deposit paid 0.7 XLM, and collecting with nothing owed returns 0 without submitting a
+  transaction. Wasm is 14,256 bytes, SHA-256
+  `04c54e379cf435601dbc8e5727d2a8da27a3c4175391758ef4a4f044cf7caf7a`.
+- README and landing page updated with the new address, toolchain version, Wasm size and measured
+  fees.
 
 ## [0.1.0] - 2026-09-17
 
