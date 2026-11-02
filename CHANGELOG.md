@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Security
+
+- The dependency audit ignores RUSTSEC-2026-0387, timing variability in `crypto-bigint`
+  0.5.5. It reaches the project only through `soroban-env-host`, the native host that
+  runs the unit tests, and is absent from the `wasm32v1-none` build, so it ships no code
+  in the deployed contract. The fix is a semver-incompatible bump that has to come from
+  upstream.
+
 ### Added
 
 - `docs/testnet-walkthrough.md`: the commands, transaction hashes and fees from the live testnet
