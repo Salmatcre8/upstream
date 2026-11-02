@@ -10,6 +10,20 @@ ignore = [
     # (ark-ff, wasmi_core) and ships no code in the contract. Revisit when
     # soroban-sdk drops it.
     { id = "RUSTSEC-2024-0436", reason = "unmaintained proc-macro via soroban-sdk; no runtime code, no upgrade available" },
+
+    # Timing variability in `crypto-bigint` 0.5.5 operations meant to be
+    # constant-time. It reaches us only through soroban-env-host, the native
+    # host used to run the unit tests:
+    #
+    #   crypto-bigint <- elliptic-curve <- ecdsa/k256/p256 <- soroban-env-host
+    #
+    # `cargo tree --target wasm32v1-none -e normal -i crypto-bigint` prints
+    # nothing, so none of it is compiled into the deployed contract, and this
+    # contract performs no signature or key operations of its own in any case.
+    # The fix is crypto-bigint 0.7.6, a semver-incompatible bump that
+    # elliptic-curve 0.13 cannot take, so it has to come from upstream.
+    # Revisit when soroban-sdk ships a host built on elliptic-curve 0.14.
+    { id = "RUSTSEC-2026-0387", reason = "timing side-channel in the native test host only; absent from the wasm build, no compatible upgrade" },
 ]
 
 [licenses]
